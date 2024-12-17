@@ -53,8 +53,12 @@ router.post('/accessChat/:userId', protect, userController.accessChat);
 
 router.post('/createGroupChat',protect, userController.createGroupChat);
 
+router.post('/fetchGroups',protect, userController.fetchGroups);
+
 router.get('/fetchChats/:userId',protect, userController.fetchChats);
 
-router.put('/groupExit/:userId',protect, userController.groupExit)
+router.put('/groupExit/:userId',protect, userController.groupExit);
+
+router.get('/fetchUsers',protect, userController.fetchAllUsersController)
 
 module.exports = router;

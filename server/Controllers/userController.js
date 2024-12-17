@@ -312,10 +312,20 @@ exports.createGroupChat = asyncHandler(async (req, res) => {
   }
 });
 
+exports.fetchGroups = asyncHandler(async (req, res) => {
+  try {
+    const allGroups = await Chat.where("isGroupChat").equals(true);
+    res.status(200).send(allGroups);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 exports.fetchChats = asyncHandler(async (req, res) => {
   try {
     const { userId } = req.params;
-console.log("userId",userId)
+
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
@@ -368,6 +378,22 @@ exports.groupExit = asyncHandler(async (req, res) => {
   } else {
     res.json(removed); // Return the updated chat details
   }
+});
+
+exports.fetchAllUsersController = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const users = await User.find(keyword).find({
+    _id: { $ne: req.user._id },
+  });
+  res.send(users);
 });
 
 
