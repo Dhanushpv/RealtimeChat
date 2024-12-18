@@ -68,12 +68,13 @@ function LoginPage() {
     };
 
     return (
+        <div className='HomePage bg-slate-300 h-screen w-full m-0 flex justify-center items-center'>
         <div className="main-container  bg-slate-200    w-12/13 h-11/12 rounded-lg flex  ">
         <div className="Login_PageContainer flex w-full">
             <div className="static">
                 <div className="rounded-lg flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center absolute text-black z-40">
-                        <img src={WhisperWaveLogo} alt="Whisper Wave Logo" />
+                        <a href=' /' ><img src={WhisperWaveLogo} alt="" /></a>
                         <span className="font-serif text-4xl LoginLogo">Whisper Wave</span>
                         <span className="font-serif tracking-[.25em] w-[29rem] text-center text-sm exo-2">
                             Message privately with friends and family using WhisperWave on your browser.
@@ -141,6 +142,9 @@ function LoginPage() {
             </div>
         </div>
         </div>
+        </div>
+
+        
     );
 }
 

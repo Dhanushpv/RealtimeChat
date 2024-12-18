@@ -11,14 +11,20 @@ import AvailableGroups from './Components/AvailableGroups/AvailableGroups';
 import ChatArea from './Components/ChatArea/ChatArea';
 import GroupCreate from './Components/GroupCreate/GroupCreate';
 import WelcomPage from './Components/WelcomPage/WelcomPage';
+import LandingPage from './Components/LandingPage/LandingPage';
 
 function App() {
   return (
-    <div className='HomePage bg-slate-300 h-screen w-full m-0 flex justify-center items-center'>
+    <div>
+     
+
+    <div className=''>
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path='/' element={<LoginPage />} />
+          
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/LoginPage' element={<LoginPage />} />
           <Route path='/SigninPage' element={<SigninPage />} />
           
 
@@ -34,6 +40,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+    </div>
     </div>
   );
 }
