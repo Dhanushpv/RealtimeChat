@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 let Chat = require('../db/models/chatModel');
 
 const asyncHandler = require("express-async-handler");
+const users = require('../db/models/users');
 
 
 exports.registerUser = async function (req, res) {
@@ -330,6 +331,52 @@ exports.accessChat = asyncHandler(async (req, res) => {
   }
 });
 
+// exports.createGroupChat = asyncHandler(async (req, res) => {
+//   const { users, chatName } = req.body;
+
+//   // Validate input
+//   if (!users || !chatName) {
+//     return res.status(400).json({ message: "Data is insufficient" });
+//   }
+
+//   try {
+//     // Ensure `users` is an array of valid ObjectIds
+//     const parsedUsers = Array.isArray(users) ? users : JSON.parse(users);
+
+//     // Validate that `parsedUsers` is a non-empty array
+//     if (!Array.isArray(parsedUsers) || parsedUsers.length === 0) {
+//       return res.status(400).json({ message: "Users array is empty or invalid" });
+//     }
+
+//     // Convert `req.user` to string and ensure it's included
+//     const currentUser = req.user._id.toString();
+//     const userIds = parsedUsers.map((u) => u.toString());
+//     userIds.push(currentUser);
+
+//     // Remove duplicates and ensure all users are valid ObjectIds
+//     const uniqueUsers = [...new Set(userIds)];
+
+//     // Create the group chat
+//     const groupChat = await Chat.create({
+//       chatName: chatName,
+//       users: uniqueUsers,
+//       isGroupChat: true,
+//       groupAdmin: currentUser,
+//     });
+
+//     // Populate the created group chat with user details
+//     const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
+//       .populate("users", "-password") // Exclude password from populated users
+//       .populate("groupAdmin", "-password"); // Exclude password from group admin
+
+//     // Send the response
+//     res.status(200).json(fullGroupChat);
+//   } catch (error) {
+//     console.error("Error creating group chat:", error.message);
+//     res.status(500).json({ message: "Failed to create group chat", error: error.message });
+//   }
+// });
+
 exports.createGroupChat = asyncHandler(async (req, res) => {
   const { users, chatName } = req.body;
 
@@ -339,7 +386,7 @@ exports.createGroupChat = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Ensure `users` is an array of valid ObjectIds
+    // Ensure `users` is an array
     const parsedUsers = Array.isArray(users) ? users : JSON.parse(users);
 
     // Validate that `parsedUsers` is a non-empty array
@@ -352,29 +399,45 @@ exports.createGroupChat = asyncHandler(async (req, res) => {
     const userIds = parsedUsers.map((u) => u.toString());
     userIds.push(currentUser);
 
-    // Remove duplicates and ensure all users are valid ObjectIds
+    // Remove duplicates and validate ObjectIds
     const uniqueUsers = [...new Set(userIds)];
+    const validUserIds = uniqueUsers.filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+    if (validUserIds.length !== uniqueUsers.length) {
+      return res.status(400).json({ message: "One or more user IDs are invalid" });
+    }
 
     // Create the group chat
     const groupChat = await Chat.create({
-      chatName: chatName,
-      users: uniqueUsers,
+      chatName,
+      users: validUserIds,
       isGroupChat: true,
       groupAdmin: currentUser,
     });
 
     // Populate the created group chat with user details
     const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
-      .populate("users", "-password") // Exclude password from populated users
-      .populate("groupAdmin", "-password"); // Exclude password from group admin
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
 
     // Send the response
-    res.status(200).json(fullGroupChat);
+    res.status(200).json({
+      message: "Group chat created successfully",
+      groupChat: fullGroupChat,
+    });
   } catch (error) {
-    console.error("Error creating group chat:", error.message);
-    res.status(500).json({ message: "Failed to create group chat", error: error.message });
+    console.error("Error creating group chat:", {
+      message: error.message,
+      body: req.body,
+      user: req.user,
+    });
+    res.status(500).json({
+      message: "Failed to create group chat",
+      error: error.message,
+    });
   }
 });
+
 
 exports.fetchGroups = asyncHandler(async (req, res) => {
   try {
@@ -459,6 +522,30 @@ exports.fetchAllUsersController = asyncHandler(async (req, res) => {
   });
   res.send(users);
 });
+
+exports.addselfgroup = asyncHandler(async (req, res) => {
+  const { chatId, userId } = req.params; // Extract chatId and userId from params
+
+  const add = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $push: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!add) {
+    res.status(404);
+    throw new Error("Chat not found"); // Updated to "Error" (capitalized for proper JavaScript behavior)
+  } else {
+    res.json(add);
+  }
+});
+
 
 
 

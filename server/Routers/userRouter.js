@@ -59,6 +59,9 @@ router.get('/fetchChats/:userId',protect, userController.fetchChats);
 
 router.put('/groupExit/:userId',protect, userController.groupExit);
 
-router.get('/fetchUsers',protect, userController.fetchAllUsersController)
+router.get('/fetchUsers',protect, userController.fetchAllUsersController);
+
+router.put('/addselfgroup/:chatId/:userId',protect, userController.addselfgroup);
+
 
 module.exports = router;
