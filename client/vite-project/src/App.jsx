@@ -30,7 +30,7 @@ function App() {
             <Route path='Availableusers' element={<Availableusers />} />
             <Route path='AvailableGroups' element={<AvailableGroups />} />
             <Route path='GroupCreate' element={<GroupCreate />} />
-            <Route path='ChatArea/:chatId' element={<ChatArea />} />
+            <Route path='ChatArea' element={<ChatArea />} />
           </Route>
         </Routes>
       </Router>

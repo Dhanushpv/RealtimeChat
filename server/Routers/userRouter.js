@@ -40,10 +40,10 @@ function setAccessControl(access_types) {
 router.post('/user', userController.registerUser);
 
 // Post a message (requires :id for reference)
-router.post('/postMessage/:id', userController.postMessage);
+// router.post('/postMessage/:id', userController.postMessage);
 
 // Send a message (requires :sender as a parameter)
-router.post('/sendMessage/:sender', userController.sendMessage);
+router.post('/sendMessage/:sender/:reciever', userController.sendMessage);
 
 // Retrieve all messages for a specific chat (requires :chatId)
 router.get('/allMessages/:chatId', userController.allMessages);
@@ -53,7 +53,7 @@ router.post('/accessChat/:userId', protect, userController.accessChat);
 
 router.post('/createGroupChat',protect, userController.createGroupChat);
 
-router.post('/fetchGroups',protect, userController.fetchGroups);
+router.get('/fetchGroups',protect, userController.fetchGroups);
 
 router.get('/fetchChats/:userId',protect, userController.fetchChats);
 

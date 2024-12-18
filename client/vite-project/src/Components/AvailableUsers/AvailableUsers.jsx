@@ -60,11 +60,11 @@ function AvailableUsers() {
       <div className="sideBar flex flex-col bg-slate-200 w-full rounded-l-lg">
         {/* Header */}
         <div className="sb-Header flex justify-between m-2 px-2 py-2 rounded-[15px] bg-white shadow-lg">
-          <div className="flex justify-center items-center">
-            <img src={WhisperWaveLogo} alt="Logo" className="w-6" />
-            <span className="px-3">Available Users</span>
-          </div>
-        </div>
+                            <div className="flex justify-center items-center">
+                                <img src={WhisperWaveLogo} alt="Logo" className="w-3" />
+                                <span className="px-3">Available Users</span>
+                            </div>
+                        </div>
 
         {/* Search Input */}
         <div className="sb-search m-2 px-3 py-3 rounded-[15px] bg-white flex items-center shadow-lg">

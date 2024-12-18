@@ -83,126 +83,190 @@ exports.registerUser = async function (req, res) {
     }
 };
  
+// exports.sendMessage = async function (req, res) {
+//     const { content, reciever } = req.body;  // Extract message content and receiver's ID from request body
+//     const sender = req.params.sender;  // Extract sender ID from route parameters
+  
+//     // Validate input
+//     if (!content || !reciever || !sender) {
+//       return res.status(400).json({ error: "Content, receiverId, and senderId are required" });
+//     }
+  
+//     // Find the receiver user by ID
+//     const receiver = await User.findById(reciever);
+//     if (!receiver) {
+//       return res.status(404).json({ error: "Receiver user not found" });
+//     }
+  
+//     // Check if a chat already exists between the sender and receiver
+//     let chat = await Chat.findOne({
+//       users: { $all: [sender, reciever] }
+//     });
+  
+//     // If no chat exists, create a new chat
+//     if (!chat) {
+//       chat = await Chat.create({
+//         users: [sender, reciever],
+//         isGroupChat: false,  // Default to false as it's a 1-to-1 chat
+//       });
+//     }
+  
+//     // Create new message object
+//     const newMessage = {
+//       sender: sender,  // Using sender from the route parameter
+//       content: content,
+//       chat: chat._id,  // The message is associated with the chat
+//       reciever: reciever,  // Add receiver to the message (updated to match schema)
+//     };
+  
+//     try {
+//       // Create a new message in the database
+//       let message = await Message.create(newMessage);
+  
+//       // Populate sender and receiver fields
+//       message = await message.populate("sender", "name pic");
+//       message = await message.populate("reciever", "name pic");  // Populating receiver field (updated to match schema)
+//       message = await message.populate("chat");
+  
+//       // Populate the users in the chat
+//       message = await User.populate(message, {
+//         path: "chat.users",
+//         select: "name email",
+//       });
+  
+//       // Update the chat with the latest message
+//       await Chat.findByIdAndUpdate(chat._id, { latestMessage: message });
+  
+//       // Send the populated message as response
+//       res.json(message);
+//     } catch (error) {
+//       console.error("Error sending message:", error);
+//       res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
+
+// exports.postMessage = async function (req, res) {
+
+//     const { content, chatId } = req.body;  // Extract message content and chat ID from request body
+
+//     // Validate input
+//     if (!content || !chatId) {
+//       console.log("Invalid data passed into request");
+//       return res.status(400).json({ error: "Content and chatId are required" });
+//     }
+  
+//     // Find the chat by ID
+//     const chat = await Chat.findById(chatId);
+//     if (!chat) {
+//       return res.status(404).json({ error: "Chat not found" });
+//     }
+//     console.log(chat)
+  
+//     // Determine the receiver by excluding the sender from the chat users
+//     const receiver = chat.users.find(user => user._id.toString() !== req.user._id.toString());
+  
+//     if (!receiver) {
+//       return res.status(404).json({ error: "Receiver not found" });
+//     }
+  
+//     // Create new message object
+//     const newMessage = {
+//       sender: req.user._id,  // Get sender ID from authenticated user
+//       content: content,
+//       chat: chatId,  // The message is associated with a chat
+//       receiver: receiver._id,  // Add receiver to the message
+//     };
+  
+//     try {
+//       // Create a new message in the database
+//       let message = await Message.create(newMessage);
+  
+//       // Populate the sender and receiver fields
+//       message = await message.populate("sender", "name pic");
+//       message = await message.populate("receiver", "name pic"); // Populate receiver's information
+//       message = await message.populate("chat");
+  
+//       // Populate the users in the chat
+//       message = await User.populate(message, {
+//         path: "chat.users",
+//         select: "name email",
+//       });
+  
+//       // Update the chat with the latest message
+//       await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
+  
+//       // Send the populated message as response
+//       res.json(message);
+//     } catch (error) {
+//       console.error("Error sending message:", error);
+//       res.status(500).json({ error: "Internal Server Error" });
+//     }
+
+// }
+
 exports.sendMessage = async function (req, res) {
-    const { content, reciever } = req.body;  // Extract message content and receiver's ID from request body
-    const sender = req.params.sender;  // Extract sender ID from route parameters
-  
-    // Validate input
-    if (!content || !reciever || !sender) {
-      return res.status(400).json({ error: "Content, receiverId, and senderId are required" });
-    }
-  
-    // Find the receiver user by ID
-    const receiver = await User.findById(reciever);
-    if (!receiver) {
-      return res.status(404).json({ error: "Receiver user not found" });
-    }
-  
-    // Check if a chat already exists between the sender and receiver
-    let chat = await Chat.findOne({
-      users: { $all: [sender, reciever] }
+  const { content } = req.body;  // Extract message content from the request body
+  const sender = req.params.sender;  // Extract sender ID from the route parameters
+  const reciever = req.params.reciever;  // Extract receiver ID from the route parameters
+
+  // Validate input
+  if (!content || !reciever || !sender) {
+    return res.status(400).json({ error: "Content, receiverId, and senderId are required" });
+  }
+
+  // Find the receiver user by ID
+  const receiverUser = await User.findById(reciever);
+  if (!receiverUser) {
+    return res.status(404).json({ error: "Receiver user not found" });
+  }
+
+  // Check if a chat already exists between the sender and receiver
+  let chat = await Chat.findOne({
+    users: { $all: [sender, reciever] }
+  });
+
+  // If no chat exists, create a new chat
+  if (!chat) {
+    chat = await Chat.create({
+      users: [sender, reciever],
+      isGroupChat: false,  // Default to false as it's a 1-to-1 chat
     });
-  
-    // If no chat exists, create a new chat
-    if (!chat) {
-      chat = await Chat.create({
-        users: [sender, reciever],
-        isGroupChat: false,  // Default to false as it's a 1-to-1 chat
-      });
-    }
-  
-    // Create new message object
-    const newMessage = {
-      sender: sender,  // Using sender from the route parameter
-      content: content,
-      chat: chat._id,  // The message is associated with the chat
-      reciever: reciever,  // Add receiver to the message (updated to match schema)
-    };
-  
-    try {
-      // Create a new message in the database
-      let message = await Message.create(newMessage);
-  
-      // Populate sender and receiver fields
-      message = await message.populate("sender", "name pic");
-      message = await message.populate("reciever", "name pic");  // Populating receiver field (updated to match schema)
-      message = await message.populate("chat");
-  
-      // Populate the users in the chat
-      message = await User.populate(message, {
-        path: "chat.users",
-        select: "name email",
-      });
-  
-      // Update the chat with the latest message
-      await Chat.findByIdAndUpdate(chat._id, { latestMessage: message });
-  
-      // Send the populated message as response
-      res.json(message);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+  }
+
+  // Create new message object
+  const newMessage = {
+    sender: sender,  // Using sender from the route parameter
+    content: content,
+    chat: chat._id,  // The message is associated with the chat
+    reciever: reciever,  // Add receiver to the message (updated to match schema)
+  };
+
+  try {
+    // Create a new message in the database
+    let message = await Message.create(newMessage);
+
+    // Populate sender and receiver fields
+    message = await message.populate("sender", "name pic");
+    message = await message.populate("reciever", "name pic");  // Populating receiver field (updated to match schema)
+    message = await message.populate("chat");
+
+    // Populate the users in the chat
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "name email",
+    });
+
+    // Update the chat with the latest message
+    await Chat.findByIdAndUpdate(chat._id, { latestMessage: message });
+
+    // Send the populated message as response
+    res.json(message);
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
-exports.postMessage = async function (req, res) {
-
-    const { content, chatId } = req.body;  // Extract message content and chat ID from request body
-
-    // Validate input
-    if (!content || !chatId) {
-      console.log("Invalid data passed into request");
-      return res.status(400).json({ error: "Content and chatId are required" });
-    }
-  
-    // Find the chat by ID
-    const chat = await Chat.findById(chatId);
-    if (!chat) {
-      return res.status(404).json({ error: "Chat not found" });
-    }
-    console.log(chat)
-  
-    // Determine the receiver by excluding the sender from the chat users
-    const receiver = chat.users.find(user => user._id.toString() !== req.user._id.toString());
-  
-    if (!receiver) {
-      return res.status(404).json({ error: "Receiver not found" });
-    }
-  
-    // Create new message object
-    const newMessage = {
-      sender: req.user._id,  // Get sender ID from authenticated user
-      content: content,
-      chat: chatId,  // The message is associated with a chat
-      receiver: receiver._id,  // Add receiver to the message
-    };
-  
-    try {
-      // Create a new message in the database
-      let message = await Message.create(newMessage);
-  
-      // Populate the sender and receiver fields
-      message = await message.populate("sender", "name pic");
-      message = await message.populate("receiver", "name pic"); // Populate receiver's information
-      message = await message.populate("chat");
-  
-      // Populate the users in the chat
-      message = await User.populate(message, {
-        path: "chat.users",
-        select: "name email",
-      });
-  
-      // Update the chat with the latest message
-      await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
-  
-      // Send the populated message as response
-      res.json(message);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-
-}
 
 exports.allMessages =async function (req, res) {
   try {

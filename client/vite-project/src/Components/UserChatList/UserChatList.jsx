@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
+
+
 function UserChatList() {
   let params = new URLSearchParams(window.location.search);
   let userId = params.get("id");
@@ -24,7 +26,7 @@ function UserChatList() {
         }
       ); // Your API endpoint
       setChats(response.data);
-      console.log("response", response.data);
+      console.log("responsedata", response.data);
     } catch (err) {
       console.error("Error fetching chats:", err);
       setError("Failed to load chats.");
@@ -40,8 +42,10 @@ function UserChatList() {
   }, [userId]); // Depend only on userId
 
   // Handle click and navigate to ChatArea
-  const handleChatClick = (chatId) => {
-    navigate(`ChatArea/${chatId}?login=${token_key}&id=${userId}`); // Pass chatId in the URL
+  const handleChatClick = (chatId, receiverId) => {
+    navigate(
+      `ChatArea?chatId=${chatId}&login=${token_key}&id=${userId}&receiver=${receiverId}` // Pass receiverId in the URL
+    );
   };
 
   return (
@@ -49,40 +53,47 @@ function UserChatList() {
       {error && <p className="text-red-500">{error}</p>}
 
       {chats.length > 0 ? (
-        chats.map((chat) => (
-          <div
-            key={chat._id}
-            onClick={() => handleChatClick(chat._id)} // Add click handler
-            className="userListitems_container flex items-center bg-slate-300 rounded-[12px] cursor-pointer hover:bg-slate-400"
-          >
-            {/* User profile */}
-            <div className="p-2">
-              <p className="bg-slate-200 text-slate-400 p-3 px-4 border-4 border-white font-extrabold rounded-full">
-                {chat.users?.[1]?.name[0]?.toUpperCase() || "?"}
-              </p>
-            </div>
+        chats.map((chat) => {
+          const receiverId =
+          chat.users[0]._id === userId ? chat.users[1]._id : chat.users[0]._id;
+        
+            console.log("receiverId",receiverId)
 
-            {/* Chat details */}
-            <div className="w-full px-2">
-              <div className="flex items-center justify-between">
-                <p className="text-xl font-semibold text-gray-700">
-                  {chat.isGroupChat
-                    ? chat.chatName
-                    : chat.users[1]?.name || "Unknown"}
-                </p>
-                <p className="text-xs text-gray-700">
-                  {new Date(chat.updatedAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+          return (
+            <div
+              key={chat._id}
+              onClick={() => handleChatClick(chat._id, receiverId)} // Pass receiverId
+              className="userListitems_container flex items-center bg-slate-300 rounded-[12px] cursor-pointer hover:bg-slate-400"
+            >
+              {/* User profile */}
+              <div className="p-2">
+                <p className="bg-slate-200 text-slate-400 p-3 px-4 border-4 border-white font-extrabold rounded-full">
+                  {chat.users?.[1]?.name[0]?.toUpperCase() || "?"}
                 </p>
               </div>
-              <p className="text-gray-700 text-xs">
-                {chat.latestMessage?.content || "No messages yet"}
-              </p>
+
+              {/* Chat details */}
+              <div className="w-full px-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xl font-semibold text-gray-700">
+                    {chat.isGroupChat
+                      ? chat.chatName
+                      : chat.users[1]?.name || "Unknown"}
+                  </p>
+                  <p className="text-xs text-gray-700">
+                    {new Date(chat.updatedAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <p className="text-gray-700 text-xs">
+                  {chat.latestMessage?.content || "No messages yet"}
+                </p>
+              </div>
             </div>
-          </div>
-        ))
+          );
+        })
       ) : (
         <p>No chats found</p>
       )}

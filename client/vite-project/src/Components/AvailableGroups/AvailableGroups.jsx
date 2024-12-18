@@ -16,7 +16,7 @@ function AvailableGroups() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setGroups(response.data);
-                console.log("")
+                console.log("response.data",response.data)
             } catch (error) {
                 console.error('Error fetching groups:', error.message);
             }
@@ -47,19 +47,19 @@ function AvailableGroups() {
                                 <div className="userListitems_container flex items-center bg-slate-300 rounded-[12px]">
                                     <div className="p-2">
                                         <p className="bg-slate-200 text-slate-400 p-3 px-4 border-4 border-white font-extrabold rounded-full">
-                                            {group.name.charAt(0).toUpperCase()}
+                                            {group.chatName?.charAt(0).toUpperCase() || "?"}
                                         </p>
                                     </div>
                                     <div className="w-full px-2">
                                         <div className="flex items-center justify-between">
                                             <p className="text-xl font-semibold text-gray-700">
-                                                {group.name}
+                                                {group.chatName || "Unnamed Group"}
                                             </p>
                                             <p className="text-xs text-gray-700">
-                                                {group.createdAt?.slice(0, 10)} {/* Date */}
+                                                {group.createdAt?.slice(0, 10) || "Unknown Date"} {/* Date */}
                                             </p>
                                         </div>
-                                        <p className="text-gray-700 text-xs">{group.description}</p>
+                                        <p className="text-gray-700 text-xs">{group.description || "No description available"}</p>
                                     </div>
                                 </div>
                             </div>
