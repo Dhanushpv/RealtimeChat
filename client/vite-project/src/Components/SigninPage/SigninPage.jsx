@@ -100,7 +100,7 @@ function SigninPage() {
 
             if (response.data.success) {
                 setSuccess('User registered successfully!');
-                navigate('/'); // Navigate to login or homepage
+                navigate('/Loginpage'); // Navigate to login or homepage
             } else {
                 setError(response.data.message || 'Registration failed.');
             }

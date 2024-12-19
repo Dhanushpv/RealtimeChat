@@ -143,9 +143,9 @@ function UserChatList() {
   }, [userId]); // Depend only on userId
 
   // Handle click and navigate to ChatArea
-  const handleChatClick = (chatId, receiverId) => {
+  const handleChatClick = (chatId, receiverIds) => {
     navigate(
-      `ChatArea?chatId=${chatId}&login=${token_key}&id=${userId}&receiver=${receiverId}` // Pass receiverId in the URL
+      `ChatArea?chatId=${chatId}&login=${token_key}&id=${userId}&receiver=${receiverIds}` // Pass receiverId in the URL
     );
   };
 
@@ -160,15 +160,15 @@ function UserChatList() {
             return null; // Skip this chat if users are not defined or not enough users
           }
 
-          const receiverId =
-            chat.users[0]._id === userId ? chat.users[1]._id : chat.users[0]._id;
+          const receiverIds = chat.users.filter(user => user._id !== userId).map(user => user._id);
 
-          console.log("receiverId", receiverId);
+
+          console.log("receiverId", receiverIds);
 
           return (
             <div
               key={chat._id}
-              onClick={() => handleChatClick(chat._id, receiverId)} // Pass receiverId
+              onClick={() => handleChatClick(chat._id, receiverIds)} // Pass receiverId
               className="userListitems_container flex items-center bg-slate-300 rounded-[12px] cursor-pointer hover:bg-slate-400"
             >
               {/* User profile */}

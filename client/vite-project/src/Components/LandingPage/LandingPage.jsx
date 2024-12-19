@@ -6,6 +6,9 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import WhisperWaveLogo from '../../Images/WhisperWaveLogo.png';
 import { ChatBubbleLeftRightIcon, ShieldCheckIcon, PhotoIcon, UsersIcon } from '@heroicons/react/24/outline'
 import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFacebook, faInstagram, faTwitter, faGithub, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import WhisperWaveloginscreenshot from '../../Images/WhisperWaveloginscreenshot.png';
 
 const navigation = [
   { name: 'Home', href: '#' },
@@ -399,7 +402,7 @@ export default function Example() {
         <div className="-ml-12 -mt-12 p-12 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:overflow-hidden">
           <img
             alt=""
-            src="https://tailwindui.com/plus/img/component-images/dark-project-app-screenshot.png"
+            src={WhisperWaveloginscreenshot}
             className="w-[48rem] max-w-none rounded-xl bg-gray-900 shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
           />
         </div>
@@ -513,6 +516,72 @@ export default function Example() {
         </div>
       </div>
     </div>
+
+    <footer className="bg-gray-900 text-gray-300 py-12">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+                            <div className="md:col-span-2">
+                                <img src={WhisperWaveLogo} alt="Company Logo" className="mb-4 w-24" />
+                                <p className="mb-4">Whisper Wave</p>
+                                <div className="flex space-x-4">
+                                  <a href="#" className="text-gray-400 hover:text-gray-300">
+                                    <FontAwesomeIcon icon={faFacebook} size="lg" />
+                                  </a>
+                                  <a href="#" className="text-gray-400 hover:text-gray-300">
+                                    <FontAwesomeIcon icon={faInstagram} size="lg" />
+                                  </a>
+                                  <a href="#" className="text-gray-400 hover:text-gray-300">
+                                    <FontAwesomeIcon icon={faTwitter} size="lg" />
+                                  </a>
+                                  <a href="#" className="text-gray-400 hover:text-gray-300">
+                                    <FontAwesomeIcon icon={faGithub} size="lg" />
+                                  </a>
+                                  <a href="#" className="text-gray-400 hover:text-gray-300">
+                                    <FontAwesomeIcon icon={faYoutube} size="lg" />
+                                  </a>
+                                </div>
+                            </div>
+                            {/* <div>
+                                <h3 className="text-white font-semibold mb-4">Solutions</h3>
+                                <ul>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Marketing</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Analytics</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Automation</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Commerce</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Insights</a></li>
+                                </ul>
+                            </div> */}
+                            <div>
+                                <h3 className="text-white font-semibold mb-4">Support</h3>
+                                <ul>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Submit ticket</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Documentation</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Guides</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="text-white font-semibold mb-4">Company</h3>
+                                <ul>
+                                    <li className="mb-2"><a href="#" className="hover:underline">About</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Blog</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Jobs</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Press</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="text-white font-semibold mb-4">Legal</h3>
+                                <ul>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Terms of service</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">Privacy policy</a></li>
+                                    <li className="mb-2"><a href="#" className="hover:underline">License</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="mt-8 border-t border-gray-700 pt-8 text-center">
+                            <p>© 2024 Your Company, Inc. All rights reserved.</p>
+                        </div>
+                    </div>
+                </footer>
 
 
     </div>

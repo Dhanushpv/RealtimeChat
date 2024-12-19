@@ -16,7 +16,7 @@
 
 
 import React from "react";
-import PropTypes from "prop-types";
+
 
 function SelfContainerSection({ message, theme }) {
     return (
@@ -36,16 +36,7 @@ function SelfContainerSection({ message, theme }) {
     );
 }
 
-// PropTypes for better type checking
-SelfContainerSection.propTypes = {
-    message: PropTypes.string.isRequired,
-    theme: PropTypes.oneOf(["light", "dark"]), // Optional: Light or dark theme
-};
 
-// Default props if theme isn't passed
-SelfContainerSection.defaultProps = {
-    theme: "light",
-};
 
 export default SelfContainerSection;
 
