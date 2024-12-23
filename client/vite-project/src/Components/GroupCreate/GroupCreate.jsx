@@ -115,7 +115,7 @@ function GroupCreate() {
       const { data } = await axios.post(
         "http://localhost:4000/createGroupChat",
         {
-          users: '["12334"]',
+          users: '["6764f39b9701084cd1806132","6764f3cb9701084cd180613b"]',
           chatName: groupName,
         },
         {
