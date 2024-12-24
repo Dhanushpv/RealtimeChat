@@ -6,6 +6,7 @@ import GroupChat from "../../Images/GroupChatLogo.png";
 import "../GroupCreate/GroupCreate.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 function GroupCreate() {
   let params = new URLSearchParams(window.location.search);
@@ -18,6 +19,8 @@ function GroupCreate() {
   const [error, setError] = useState("");
   const [users, setUsers] = useState([]); // To hold the user list
   const [selectedUsers, setSelectedUsers] = useState([]); // To keep track of selected users
+
+  const lightTheme = useSelector((state) => state.themeKey.themeKey);
 
   // Fetch the list of users that can be added to the group
   useEffect(() => {
@@ -89,18 +92,21 @@ function GroupCreate() {
 
   return (
     <>
+    <div className={`sb-conversation m-2 px-3  shadow-lg pt-5 rounded-[15px] bg-white  overflow-y-auto
+            [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-gray-300 ${lightTheme ? '' : 'dark'}`}>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className="flex justify-center flex-col items-center w-full">
         <div className="flex justify-center">
           <img src={GroupChat} alt="Group Chat" className="w-2/5" />
         </div>
         <div className="sour-gummy text-4xl pb-3">Create Group Chat</div>
-        <div className="m-2 px-3 py-3 rounded-[15px] bg-white flex justify-between shadow-lg w-1/2">
+        <div className={`m-2 px-3 py-3 rounded-[15px] bg-white flex justify-between shadow-lg w-1/2 `}>
           <input
             placeholder="Enter Group Name"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            className="px-2 w-full border-0 outline-0 bg-transparent"
+            className={`px-2 w-full border-0 outline-0 bg-transparent `}
             disabled={loading}
           />
           <IconButton onClick={handleCreateGroup} disabled={loading}>
@@ -112,10 +118,10 @@ function GroupCreate() {
         {/* List of users to be added to the group */}
         <div className="w-1/2 mt-4">
           <h4>Select users to add:</h4>
-          <div className="user-list">
+          {/* <div className="user-list">
             {Array.isArray(users) &&
               users.map((user) => (
-                <div key={user._id} className="user-item">
+                <div key={user._id} className="user-item m-2 px-3 py-3 shadow-lg pt-5 rounded-[15px] bg-white h-full">
                   <input
                     type="checkbox"
                     checked={selectedUsers.includes(user._id)} // Check if the user is selected
@@ -124,8 +130,48 @@ function GroupCreate() {
                   {user.name}
                 </div>
               ))}
-          </div>
+          </div> */}
+
+<div className="user-list">
+  {Array.isArray(users) &&
+    users.map((user) => (
+      <div
+        key={user._id}
+        className="user-item m-2 px-3 py-3 shadow-lg pt-5 rounded-[15px] bg-white h-full flex items-center gap-3"
+      >
+        {/* Custom Checkbox */}
+        <div className="relative">
+          <label
+            htmlFor={`checkbox-${user._id}`}
+            className="relative flex size-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-tr from-[#4158D0] via-[#C850C0] to-[#FFCC70] p-1 duration-100 hover:p-1.5"
+          >
+            <input
+              type="checkbox"
+              id={`checkbox-${user._id}`}
+              className="group peer hidden"
+              checked={selectedUsers.includes(user._id)} // Check if the user is selected
+              onChange={() => handleUserSelection(user._id)} // Handle selection
+            />
+            <label
+              htmlFor={`checkbox-${user._id}`}
+              className="size-full rounded-full bg-black peer-checked:size-0"
+            ></label>
+            <div
+              className="absolute left-[0.7rem] h-[2px] w-[12px] -translate-y-5 translate-x-5 rotate-[-41deg] rounded-sm bg-white duration-300 peer-checked:translate-x-0 peer-checked:translate-y-0"
+            ></div>
+            <div
+              className="absolute left-1.5 top-3 h-[2px] w-[8px] -translate-x-5 -translate-y-5 rotate-[45deg] rounded-sm bg-white duration-300 peer-checked:translate-x-0 peer-checked:translate-y-0"
+            ></div>
+          </label>
         </div>
+        {/* User Name */}
+        <span>{user.name}</span>
+      </div>
+    ))}
+</div>
+
+        </div>
+      </div>
       </div>
     </>
   );

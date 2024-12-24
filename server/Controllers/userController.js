@@ -357,7 +357,7 @@ exports.fetchChats = asyncHandler(async (req, res) => {
 });
 
 exports.groupExit = asyncHandler(async (req, res) => {
-  const { chatId } = req.body; // chatId comes from the request body
+  const { chatId } = req.params; // chatId comes from the request body
   const { userId } = req.params; // userId comes from the URL parameters
 
   // Check if the requester is an admin (optional logic for your app)
@@ -510,6 +510,61 @@ exports.chatDetails = async  function (req, res)  {
       res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.ClearChat = async function (req, res) { 
+  try {
+    const { chatId } = req.params; // Get chatId from URL parameters
+
+    if (!chatId) {
+      return res.status(400).json({ message: 'chatId is required to clear specific chat messages' });
+    }
+
+    // Validate chatId format
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+      return res.status(400).json({ message: 'Invalid chatId format' });
+    }
+
+    // Check if chat exists
+    const chatExists = await Chat.findById(chatId);
+    if (!chatExists) {
+      return res.status(404).json({ message: `Chat with ID ${chatId} does not exist` });
+    }
+
+    // Delete messages for the chatId
+    const result = await Message.deleteMany({ chat: chatId });
+
+    console.log(`Deleted ${result.deletedCount} messages for chatId: ${chatId}`);
+
+    res.status(200).json({ message: `Chat messages for chatId: ${chatId} cleared successfully` });
+  } catch (error) {
+    console.error('Error occurred while clearing chat messages:', error);
+    res.status(500).json({ message: 'An error occurred while clearing messages' });
+  }
+};
+
+exports.logined = async function (req, res) {
+  try {
+    const userId = req.params.id; // Extract user ID from params
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the user data
+    res.status(200).json({ message: 'User found', user });
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+
+
 
 
 

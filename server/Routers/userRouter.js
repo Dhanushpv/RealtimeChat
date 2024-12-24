@@ -57,7 +57,7 @@ router.get('/fetchGroups',protect, userController.fetchGroups);
 
 router.get('/fetchChats/:userId',protect, userController.fetchChats);
 
-router.put('/groupExit/:userId',protect, userController.groupExit);
+router.put('/groupExit/:chatId/:userId',protect, userController.groupExit);
 
 router.get('/fetchUsers',protect, userController.fetchAllUsersController);
 
@@ -66,6 +66,12 @@ router.put('/addselfgroup/:chatId/:userId',protect, userController.addselfgroup)
 router.post('/sendGroupMessage/:chatId/:sender',protect, userController.sendGroupMessage);
 
 router.get('/chatDetails/:chatId',protect, userController.chatDetails);
+
+router.delete('/ClearChat/:chatId', userController.ClearChat);
+
+router.get('/logined/:id', userController.logined);
+
+
 
 
 

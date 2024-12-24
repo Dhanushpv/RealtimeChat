@@ -12,6 +12,7 @@ import ChatArea from './Components/ChatArea/ChatArea';
 import GroupCreate from './Components/GroupCreate/GroupCreate';
 import WelcomPage from './Components/WelcomPage/WelcomPage';
 import LandingPage from './Components/LandingPage/LandingPage';
+import Profile from './Components/Profile/Profile';
 
 function App() {
   return (
@@ -37,6 +38,8 @@ function App() {
             <Route path='AvailableGroups' element={<AvailableGroups />} />
             <Route path='GroupCreate' element={<GroupCreate />} />
             <Route path='ChatArea' element={<ChatArea />} />
+            <Route path='Profile' element={<Profile />} />
+
           </Route>
         </Routes>
       </Router>

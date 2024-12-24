@@ -38,13 +38,16 @@ function SideBar(){
       const AddCircleIcons = () => {
         navigate(`GroupCreate?login=${token_key}&id=${userId}`); // Pass chatId in the URL
       };
+      const AccountCircleIcons = () => {
+        navigate(`Profile?login=${token_key}&id=${userId}`); // Pass chatId in the URL
+      };
 
 
     return(
         <>
         <div className={" sideBar flex flex-col h-full  bg-slate-200 w-2/5 rounded-l-lg"+ (lightTheme ? "" : "dark")}>
         <div className={"sb-Header flex justify-between m-2 px-2 py-2 rounded-[15px] bg-white shadow-lg " + (lightTheme ? "" : "dark")}>
-            <div><IconButton ><AccountCircleIcon className={"" + (lightTheme ? "" : "dark")} /></IconButton></div>
+            <div><IconButton ><AccountCircleIcon  onClick={AccountCircleIcons}  className={"" + (lightTheme ? "" : "dark")} /></IconButton></div>
             <div>
                 <IconButton>  <PersonAddIcon  onClick={PersonAddIcons} className={"" + (lightTheme ? "" : "dark")} /></IconButton>
                 <IconButton>  <GroupAddIcon onClick={GroupAddIcons} className={"" + (lightTheme ? "" : "dark")} /></IconButton>
