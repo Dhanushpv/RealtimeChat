@@ -83,127 +83,6 @@ exports.registerUser = async function (req, res) {
         return;
     }
 };
- 
-// exports.sendMessage = async function (req, res) {
-//     const { content, reciever } = req.body;  // Extract message content and receiver's ID from request body
-//     const sender = req.params.sender;  // Extract sender ID from route parameters
-  
-//     // Validate input
-//     if (!content || !reciever || !sender) {
-//       return res.status(400).json({ error: "Content, receiverId, and senderId are required" });
-//     }
-  
-//     // Find the receiver user by ID
-//     const receiver = await User.findById(reciever);
-//     if (!receiver) {
-//       return res.status(404).json({ error: "Receiver user not found" });
-//     }
-  
-//     // Check if a chat already exists between the sender and receiver
-//     let chat = await Chat.findOne({
-//       users: { $all: [sender, reciever] }
-//     });
-  
-//     // If no chat exists, create a new chat
-//     if (!chat) {
-//       chat = await Chat.create({
-//         users: [sender, reciever],
-//         isGroupChat: false,  // Default to false as it's a 1-to-1 chat
-//       });
-//     }
-  
-//     // Create new message object
-//     const newMessage = {
-//       sender: sender,  // Using sender from the route parameter
-//       content: content,
-//       chat: chat._id,  // The message is associated with the chat
-//       reciever: reciever,  // Add receiver to the message (updated to match schema)
-//     };
-  
-//     try {
-//       // Create a new message in the database
-//       let message = await Message.create(newMessage);
-  
-//       // Populate sender and receiver fields
-//       message = await message.populate("sender", "name pic");
-//       message = await message.populate("reciever", "name pic");  // Populating receiver field (updated to match schema)
-//       message = await message.populate("chat");
-  
-//       // Populate the users in the chat
-//       message = await User.populate(message, {
-//         path: "chat.users",
-//         select: "name email",
-//       });
-  
-//       // Update the chat with the latest message
-//       await Chat.findByIdAndUpdate(chat._id, { latestMessage: message });
-  
-//       // Send the populated message as response
-//       res.json(message);
-//     } catch (error) {
-//       console.error("Error sending message:", error);
-//       res.status(500).json({ error: "Internal Server Error" });
-//     }
-// };
-
-// exports.postMessage = async function (req, res) {
-
-//     const { content, chatId } = req.body;  // Extract message content and chat ID from request body
-
-//     // Validate input
-//     if (!content || !chatId) {
-//       console.log("Invalid data passed into request");
-//       return res.status(400).json({ error: "Content and chatId are required" });
-//     }
-  
-//     // Find the chat by ID
-//     const chat = await Chat.findById(chatId);
-//     if (!chat) {
-//       return res.status(404).json({ error: "Chat not found" });
-//     }
-//     console.log(chat)
-  
-//     // Determine the receiver by excluding the sender from the chat users
-//     const receiver = chat.users.find(user => user._id.toString() !== req.user._id.toString());
-  
-//     if (!receiver) {
-//       return res.status(404).json({ error: "Receiver not found" });
-//     }
-  
-//     // Create new message object
-//     const newMessage = {
-//       sender: req.user._id,  // Get sender ID from authenticated user
-//       content: content,
-//       chat: chatId,  // The message is associated with a chat
-//       receiver: receiver._id,  // Add receiver to the message
-//     };
-  
-//     try {
-//       // Create a new message in the database
-//       let message = await Message.create(newMessage);
-  
-//       // Populate the sender and receiver fields
-//       message = await message.populate("sender", "name pic");
-//       message = await message.populate("receiver", "name pic"); // Populate receiver's information
-//       message = await message.populate("chat");
-  
-//       // Populate the users in the chat
-//       message = await User.populate(message, {
-//         path: "chat.users",
-//         select: "name email",
-//       });
-  
-//       // Update the chat with the latest message
-//       await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
-  
-//       // Send the populated message as response
-//       res.json(message);
-//     } catch (error) {
-//       console.error("Error sending message:", error);
-//       res.status(500).json({ error: "Internal Server Error" });
-//     }
-
-// }
 
 exports.sendMessage = async function (req, res) {
   const { content } = req.body;  // Extract message content from the request body
@@ -230,7 +109,7 @@ exports.sendMessage = async function (req, res) {
   if (!chat) {
     chat = await Chat.create({
       users: [sender, reciever],
-      isGroupChat: false,  // Default to false as it's a 1-to-1 chat
+      // isGroupChat: false,  // Default to false as it's a 1-to-1 chat
     });
   }
 
@@ -267,7 +146,6 @@ exports.sendMessage = async function (req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 exports.allMessages =async function (req, res) {
   try {
@@ -438,7 +316,6 @@ exports.createGroupChat = asyncHandler(async (req, res) => {
   }
 });
 
-
 exports.fetchGroups = asyncHandler(async (req, res) => {
   try {
     const allGroups = await Chat.where("isGroupChat").equals(true);
@@ -526,26 +403,113 @@ exports.fetchAllUsersController = asyncHandler(async (req, res) => {
 exports.addselfgroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.params; // Extract chatId and userId from params
 
-  const add = await Chat.findByIdAndUpdate(
-    chatId,
-    {
-      $push: { users: userId },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+  try {
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $addToSet: { users: userId }, // Use $addToSet to prevent duplicate entries
+      },
+      {
+        new: true,
+      }
+    )
+      .populate("users", "-password") // Populate users field without the password
+      .populate("groupAdmin", "-password"); // Populate groupAdmin field without the password
 
-  if (!add) {
-    res.status(404);
-    throw new Error("Chat not found"); // Updated to "Error" (capitalized for proper JavaScript behavior)
-  } else {
-    res.json(add);
+    if (!updatedChat) {
+      return res.status(404).json({ message: "Chat not found" }); // Proper error response
+    }
+
+    res.status(200).json(updatedChat); // Respond with updated chat
+  } catch (error) {
+    res.status(500).json({ message: error.message }); // Handle server errors
   }
 });
 
+exports.sendGroupMessage = asyncHandler(async (req, res) => {
+  const { content } = req.body; // Extract message content from the request body
+  const sender = req.params.sender; // Extract sender ID from the route parameters
+  const chatId = req.params.chatId; // Extract group ID from the route parameters
+
+  // Validate input
+  if (!content || !chatId || !sender) {
+    return res.status(400).json({ error: "Content, groupId, and senderId are required" });
+  }
+
+  // Validate sender and groupId as ObjectId
+  if (!mongoose.Types.ObjectId.isValid(sender) || !mongoose.Types.ObjectId.isValid(chatId)) {
+    return res.status(400).json({ error: "Invalid sender or groupId format" });
+  }
+
+  try {
+    // Check if the group chat exists
+    const groupChat = await Chat.findOne({ _id: chatId, isGroupChat: true });
+    if (!groupChat) {
+      return res.status(404).json({ error: "Group chat not found" });
+    }
+    console.log("groupChat",groupChat)
+
+    // Ensure the sender is a member of the group
+    if (!groupChat.users.map(user => user.toString()).includes(sender)) {
+      return res.status(403).json({ error: "Sender is not a member of the group" });
+    }
+
+    // Create new message object
+    const newMessage = {
+      sender: sender,
+      content: content,
+      chat: chatId, // Associate the message with the group chat
+    };
+
+    // Save the message to the database
+    let message = await Message.create(newMessage);
+
+    // Populate sender and chat fields
+    message = await message.populate("sender", "name pic");
+    message = await message.populate("chat");
+
+    // Populate users in the chat
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "name email",
+    });
+
+    // Update the group chat with the latest message
+    await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
+
+    // Send the populated message as response
+    res.json(message);
+  } catch (error) {
+    console.error("Error sending group message:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+exports.chatDetails = async  function (req, res)  {
+  try {
+      const { chatId } = req.params;
+      
+      // Find the chat by chatId
+      const chat = await Chat.findById(chatId)
+          .populate('users', '-password')  // Optionally populate user details
+          .populate('groupAdmin', '-password');  // Optionally populate group admin details
+
+      if (!chat) {
+          return res.status(404).json({ message: "Chat not found" });
+      }
+
+      // Respond with chat details including whether it's a group chat
+      res.status(200).json({
+          isGroupChat: chat.isGroupChat,  // If it's a group chat or not
+          chatName: chat.chatName,  // The name of the chat, for example
+          users: chat.users,  // Users in the chat
+          groupAdmin: chat.groupAdmin,  // Group admin details
+      });
+  } catch (err) {
+      console.error("Error fetching chat details:", err);
+      res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 

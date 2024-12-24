@@ -63,5 +63,12 @@ router.get('/fetchUsers',protect, userController.fetchAllUsersController);
 
 router.put('/addselfgroup/:chatId/:userId',protect, userController.addselfgroup);
 
+router.post('/sendGroupMessage/:chatId/:sender',protect, userController.sendGroupMessage);
+
+router.get('/chatDetails/:chatId',protect, userController.chatDetails);
+
+
+
+
 
 module.exports = router;

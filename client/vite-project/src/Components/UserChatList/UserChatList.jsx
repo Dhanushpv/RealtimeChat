@@ -24,7 +24,7 @@ function UserChatList() {
         }
       ); // Your API endpoint
       setChats(response.data);
-      console.log("responsedataresponse.data", response.data);
+      // console.log("responsedataresponse.data", response.data);
     } catch (err) {
       console.error("Error fetching chats:", err);
       setError("Failed to load chats.");

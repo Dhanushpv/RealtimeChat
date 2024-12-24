@@ -1,0 +1,57 @@
+exports.sendGroupMessage = async function (req, res) {
+  const { content } = req.body; // Extract message content from the request body
+  const sender = req.params.sender; // Extract sender ID from the route parameters
+  const groupId = req.params.groupId; // Extract group ID from the route parameters
+
+  // Validate input
+  if (!content || !groupId || !sender) {
+    return res.status(400).json({ error: "Content, groupId, and senderId are required" });
+  }
+
+  // Validate sender and groupId as ObjectId
+  if (!mongoose.Types.ObjectId.isValid(sender) || !mongoose.Types.ObjectId.isValid(groupId)) {
+    return res.status(400).json({ error: "Invalid sender or groupId format" });
+  }
+
+  try {
+    // Check if the group chat exists
+    const groupChat = await Chat.findOne({ _id: groupId, isGroupChat: true });
+    if (!groupChat) {
+      return res.status(404).json({ error: "Group chat not found" });
+    }
+
+    // Ensure the sender is a member of the group
+    if (!groupChat.users.map(user => user.toString()).includes(sender)) {
+      return res.status(403).json({ error: "Sender is not a member of the group" });
+    }
+
+    // Create new message object
+    const newMessage = {
+      sender: sender,
+      content: content,
+      chat: groupId, // Associate the message with the group chat
+    };
+
+    // Save the message to the database
+    let message = await Message.create(newMessage);
+
+    // Populate sender and chat fields
+    message = await message.populate("sender", "name pic");
+    message = await message.populate("chat");
+
+    // Populate users in the chat
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "name email",
+    });
+
+    // Update the group chat with the latest message
+    await Chat.findByIdAndUpdate(groupId, { latestMessage: message });
+
+    // Send the populated message as response
+    res.json(message);
+  } catch (error) {
+    console.error("Error sending group message:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
